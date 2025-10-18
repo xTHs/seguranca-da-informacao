@@ -1,0 +1,27 @@
+# Arquivos sensíveis
+*.key
+*.pem
+passwords.txt
+secrets/
+
+# VMs e snapshots
+*.vdi
+*.vmdk
+*.vbox
+*.vmx
+*.nvram
+
+# Evidências grandes (usar Git LFS se necessário)
+evidence/*.img
+evidence/*.dd
+evidence/*.raw
+
+# Logs temporários
+*.log
+temp/
+
+# Sistema
+.DS_Store
+Thumbs.db
+*.swp
+*.tmp

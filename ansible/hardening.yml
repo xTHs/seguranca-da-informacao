@@ -1,0 +1,92 @@
+---
+- hosts: vitima
+  become: yes
+  tasks:
+    - name: Ensure security packages
+      apt:
+        name:
+          - unattended-upgrades
+          - libpam-pwquality
+          - fail2ban
+          - ufw
+        state: present
+        update_cache: yes
+
+    - name: SSH hardening configuration
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+        state: present
+        create: no
+        backrefs: yes
+      loop:
+        - { regexp: '^#?PasswordAuthentication\s+.*', line: 'PasswordAuthentication no' }
+        - { regexp: '^#?PermitRootLogin\s+.*', line: 'PermitRootLogin no' }
+        - { regexp: '^#?MaxAuthTries\s+.*', line: 'MaxAuthTries 3' }
+        - { regexp: '^#?LoginGraceTime\s+.*', line: 'LoginGraceTime 20' }
+        - { regexp: '^#?PubkeyAuthentication\s+.*', line: 'PubkeyAuthentication yes' }
+        - { regexp: '^#?UsePAM\s+.*', line: 'UsePAM yes' }
+        - { regexp: '^#?AllowUsers\s+.*', line: 'AllowUsers prof' }
+
+    - name: Disable weak SSH algorithms
+      blockinfile:
+        path: /etc/ssh/sshd_config
+        block: |
+          # Secure ciphers and algorithms
+          Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
+          MACs hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha2-256,hmac-sha2-512
+          KexAlgorithms curve25519-sha256@libssh.org,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512
+
+    - name: Enforce password quality
+      lineinfile:
+        path: /etc/security/pwquality.conf
+        regexp: '^#?minlen\s*=.*'
+        line: 'minlen = 12'
+
+    - name: Configure UFW firewall
+      ufw:
+        state: enabled
+        policy: deny
+        direction: incoming
+
+    - name: Allow SSH through firewall
+      ufw:
+        rule: allow
+        port: '22'
+        proto: tcp
+
+    - name: Configure fail2ban jail for SSH
+      copy:
+        dest: /etc/fail2ban/jail.d/sshd.local
+        content: |
+          [sshd]
+          enabled = true
+          port = ssh
+          filter = sshd
+          logpath = /var/log/auth.log
+          maxretry = 3
+          bantime = 1h
+          findtime = 10m
+
+    - name: Enable automatic security updates
+      copy:
+        dest: /etc/apt/apt.conf.d/20auto-upgrades
+        content: |
+          APT::Periodic::Update-Package-Lists "1";
+          APT::Periodic::Unattended-Upgrade "1";
+
+    - name: Restart services
+      service:
+        name: "{{ item }}"
+        state: restarted
+      loop:
+        - ssh
+        - fail2ban
+
+    - name: Generate SSH key for prof user
+      user:
+        name: prof
+        generate_ssh_key: yes
+        ssh_key_bits: 4096
+        ssh_key_file: .ssh/id_rsa
