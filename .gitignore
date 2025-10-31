@@ -16,6 +16,10 @@ evidence/*.img
 evidence/*.dd
 evidence/*.raw
 
+# Imagens ISO do sistema
+*.iso
+ubuntu-*.iso
+
 # Logs temporários
 temp/
 
