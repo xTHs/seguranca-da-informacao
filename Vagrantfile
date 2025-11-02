@@ -12,6 +12,8 @@ Vagrant.configure("2") do |config|
       vb.name = "SSH-Lab-Def-Weak"
       vb.memory = "2048"
       vb.cpus = 2
+      vb.customize ["modifyvm", :id, "--nested-hw-virt", "on"]
+      vb.customize ["modifyvm", :id, "--paravirtprovider", "kvm"]
     end
     
     weak.vm.provision "shell", path: "provision/def_weak_provision.sh"
@@ -27,6 +29,8 @@ Vagrant.configure("2") do |config|
       vb.name = "SSH-Lab-Def-Hard"
       vb.memory = "2048"
       vb.cpus = 2
+      vb.customize ["modifyvm", :id, "--nested-hw-virt", "on"]
+      vb.customize ["modifyvm", :id, "--paravirtprovider", "kvm"]
     end
     
     hard.vm.provision "shell", path: "provision/def_hard_provision.sh"
@@ -42,6 +46,8 @@ Vagrant.configure("2") do |config|
       vb.name = "SSH-Lab-Atacante"
       vb.memory = "2048"
       vb.cpus = 2
+      vb.customize ["modifyvm", :id, "--nested-hw-virt", "on"]
+      vb.customize ["modifyvm", :id, "--paravirtprovider", "kvm"]
     end
     
     atacante.vm.provision "shell", path: "provision/atacante_provision.sh"
