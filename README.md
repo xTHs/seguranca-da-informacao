@@ -26,7 +26,7 @@ Laboratório prático de segurança SSH com 2 VMs isoladas para testes éticos.
 
 ## 🚀 Setup Rápido
 
-### Ubuntu (Recomendado para Apresentação)
+### Ubuntu
 ```bash
 # Instalar dependências
 sudo apt update
