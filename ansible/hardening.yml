@@ -1,5 +1,5 @@
 ---
-- hosts: vitima
+- hosts: def-weak
   become: yes
   tasks:
     - name: Ensure security packages

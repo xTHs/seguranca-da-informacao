@@ -1,71 +1,55 @@
 #!/bin/bash
-# Provisionamento VM DEFENSOR FRACO - Configuração INTENCIONALMENTE INSEGURA
+# ==============================================================================
+# Script: def_weak_provision.sh
+# Descrição: Provisionamento da VM defensor com configurações INTENCIONALMENTE
+#            INSEGURAS para fins educacionais
+# Autor: Projeto Segurança da Informação
+# Data: 2025-01-24
+# Uso: Executado automaticamente pelo Vagrant durante 'vagrant up'
+# ATENÇÃO: NÃO usar em ambiente de produção!
+# ==============================================================================
 
-echo "=== Configurando VM Defensor Fraco (INSEGURO) ==="
+set -e  # Parar execução em caso de erro
 
-# Atualizar sistema
-apt-get update
+echo "=== Configurando VM Defensor Fraco ==="
 
-# Instalar pacotes essenciais
-apt-get install -y openssh-server rsyslog chrony ufw fail2ban
+# Configurar instalação não-interativa
+export DEBIAN_FRONTEND=noninteractive
 
-# Criar usuário vulnerável (DEMO APENAS)
-useradd -m -s /bin/bash prof
+# Atualizar repositórios e instalar pacotes essenciais
+apt-get update -qq
+apt-get install -y openssh-server ufw
+
+# Criar usuário vulnerável com senha fraca (DEMO)
+# VULNERABILIDADE 1: Senha fraca e previsível
+id -u prof &>/dev/null || useradd -m -s /bin/bash prof
 echo 'prof:Prof123' | chpasswd
-usermod -aG sudo prof
+usermod -aG sudo prof  # Adicionar ao grupo sudo
 
-# Configurar SSH INSEGURO (para demonstração)
-cp /etc/ssh/sshd_config /etc/ssh/sshd_config.backup
-cat >> /etc/ssh/sshd_config << EOF
+# Configurar SSH com vulnerabilidades intencionais
+# VULNERABILIDADE 2: Autenticação por senha habilitada
+sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
 
-# === CONFIGURAÇÕES INSEGURAS PARA LABORATÓRIO ===
-# NÃO USAR EM PRODUÇÃO!
-PasswordAuthentication yes
-PermitRootLogin yes
-MaxAuthTries 6
-LoginGraceTime 120
-# Sem AllowUsers (acesso amplo)
-EOF
+# VULNERABILIDADE 3: Root login permitido
+sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 
-# Configurar UFW permissivo (INSEGURO)
+# VULNERABILIDADE 4: Muitas tentativas de autenticação
+sed -i 's/#MaxAuthTries 6/MaxAuthTries 6/' /etc/ssh/sshd_config
+
+# Configurar firewall permissivo (INSEGURO)
+# VULNERABILIDADE 5: Firewall com política default allow
+ufw --force disable
 ufw --force reset
-ufw default allow
-ufw allow 22/tcp
+ufw default allow incoming   # INSEGURO: Permite todo tráfego de entrada
+ufw default allow outgoing
 ufw --force enable
 
-# Fail2ban instalado mas DESABILITADO (INSEGURO)
-systemctl enable fail2ban
-systemctl stop fail2ban
-
-# Configurar chrony para sincronismo
-systemctl enable --now chronyd
-
-# Habilitar serviços
-systemctl enable --now ssh
-systemctl enable --now rsyslog
+# Reiniciar serviço SSH para aplicar configurações
 systemctl restart ssh
-systemctl restart rsyslog
 
-# Criar arquivo de recurso para demonstração
-mkdir -p /opt
-echo "Recurso institucional - Acesso em $(date)" > /opt/recurso_demo.log
-chmod 644 /opt/recurso_demo.log
+# Configurar resolução de nomes local
+grep -q "192.168.56.10 def-weak" /etc/hosts || echo "192.168.56.10 def-weak" >> /etc/hosts
+grep -q "192.168.56.20 atacante" /etc/hosts || echo "192.168.56.20 atacante" >> /etc/hosts
 
-# Configurar hostname no /etc/hosts
-echo "127.0.0.1 def-weak.lab.local def-weak" >> /etc/hosts
-echo "192.168.56.10 def-weak.lab.local def-weak" >> /etc/hosts
-echo "192.168.56.11 def-hard.lab.local def-hard" >> /etc/hosts
-echo "192.168.56.20 atacante.lab.local atacante" >> /etc/hosts
-
-# Verificar serviços
-echo "=== Status dos Serviços ==="
-systemctl status ssh --no-pager -l
-ss -tulpn | grep :22
-
-echo "=== VM Defensor Fraco Configurada ==="
-echo "IP: 192.168.56.10"
-echo "Hostname: def-weak.lab.local"
-echo "Usuário: prof / Senha: Prof123 (DEMO APENAS)"
-echo "SSH: CONFIGURAÇÃO INSEGURA INTENCIONAL"
-echo "UFW: Permissivo (default allow)"
-echo "Fail2ban: DESABILITADO"
+echo "=== Defensor Configurado ==="
+echo "IP: 192.168.56.10 | User: prof | Pass: Prof123"

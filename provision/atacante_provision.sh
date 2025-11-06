@@ -1,60 +1,37 @@
 #!/bin/bash
-# Provisionamento VM ATACANTE - Ferramentas de pentest e coleta
+# ==============================================================================
+# Script: atacante_provision.sh
+# Descrição: Provisionamento da VM atacante com ferramentas de teste de segurança
+# Autor: Projeto Segurança da Informação
+# Data: 2025-01-24
+# Uso: Executado automaticamente pelo Vagrant durante 'vagrant up'
+# ATENÇÃO: Uso exclusivo para fins educacionais em ambiente isolado!
+# ==============================================================================
+
+set -e  # Parar execução em caso de erro
 
 echo "=== Configurando VM Atacante ==="
 
-# Atualizar sistema
-apt-get update
+# Configurar instalação não-interativa
+export DEBIAN_FRONTEND=noninteractive
 
-# Instalar ferramentas essenciais
-apt-get install -y nmap hydra tcpdump rsyslog chrony python3-pip git
+# Atualizar repositórios
+apt-get update -qq
+
+# Instalar ferramentas de teste de segurança
+# nmap: Scanner de rede e portas
+# hydra: Ferramenta de força bruta
+# tcpdump: Captura de pacotes de rede
+# python3-pip: Gerenciador de pacotes Python
+apt-get install -y nmap hydra tcpdump python3-pip
 
 # Instalar ssh-audit via pip
-pip3 install ssh-audit
+# ssh-audit: Ferramenta de auditoria de configurações SSH
+pip3 install --quiet ssh-audit
 
-# Configurar rsyslog como coletor (opcional para logs centralizados)
-cp /etc/rsyslog.conf /etc/rsyslog.conf.backup
-cat >> /etc/rsyslog.conf << EOF
+# Configurar resolução de nomes local
+grep -q "192.168.56.10 def-weak" /etc/hosts || echo "192.168.56.10 def-weak" >> /etc/hosts
+grep -q "192.168.56.20 atacante" /etc/hosts || echo "192.168.56.20 atacante" >> /etc/hosts
 
-# Habilitar recepção de logs UDP/TCP (opcional)
-module(load="imudp")
-input(type="imudp" port="514")
-module(load="imtcp")
-input(type="imtcp" port="514")
-EOF
-
-# Configurar chrony para sincronismo
-systemctl enable --now chronyd
-
-# Habilitar serviços
-systemctl enable --now rsyslog
-systemctl restart rsyslog
-
-# Criar diretórios de trabalho
-mkdir -p /tmp/evidence_collection
-mkdir -p /tmp/attack_logs
-
-# Configurar hostname no /etc/hosts
-echo "127.0.0.1 atacante.lab.local atacante" >> /etc/hosts
-echo "192.168.56.10 def-weak.lab.local def-weak" >> /etc/hosts
-echo "192.168.56.11 def-hard.lab.local def-hard" >> /etc/hosts
-echo "192.168.56.20 atacante.lab.local atacante" >> /etc/hosts
-
-# Verificar ferramentas instaladas
-echo "=== Ferramentas Disponíveis ==="
-nmap --version | head -1
-hydra -h | head -1 2>/dev/null || echo "Hydra: OK"
-ssh-audit --help | head -1 2>/dev/null || echo "ssh-audit: OK"
-tcpdump --version 2>&1 | head -1
-
-# Verificar recepção de logs
-echo "=== Testando Coleta de Logs ==="
-systemctl status rsyslog --no-pager -l
-ss -tulpn | grep :514
-
-echo "=== VM Atacante Configurada ==="
-echo "IP: 192.168.56.20"
-echo "Hostname: atacante.lab.local"
-echo "Ferramentas: nmap, hydra, ssh-audit, tcpdump"
-echo "Rsyslog: Coletando na porta 514 (opcional)"
-echo "AVISO: Uso apenas em ambiente isolado para fins acadêmicos!"
+echo "=== Atacante Configurado ==="
+echo "IP: 192.168.56.20 | Ferramentas: nmap, hydra, ssh-audit, tcpdump"
