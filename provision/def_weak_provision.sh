@@ -27,14 +27,27 @@ echo 'prof:Prof123' | chpasswd
 usermod -aG sudo prof  # Adicionar ao grupo sudo
 
 # Configurar SSH com vulnerabilidades intencionais
+# Backup do arquivo original
+cp /etc/ssh/sshd_config /etc/ssh/sshd_config.backup
+
 # VULNERABILIDADE 2: Autenticação por senha habilitada
-sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
+sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
 
 # VULNERABILIDADE 3: Root login permitido
-sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config
 
 # VULNERABILIDADE 4: Muitas tentativas de autenticação
-sed -i 's/#MaxAuthTries 6/MaxAuthTries 6/' /etc/ssh/sshd_config
+sed -i 's/^#\?MaxAuthTries.*/MaxAuthTries 6/' /etc/ssh/sshd_config
+
+# Garantir que as configurações estão aplicadas
+grep -q "^PasswordAuthentication yes" /etc/ssh/sshd_config || echo "PasswordAuthentication yes" >> /etc/ssh/sshd_config
+grep -q "^PermitRootLogin yes" /etc/ssh/sshd_config || echo "PermitRootLogin yes" >> /etc/ssh/sshd_config
+grep -q "^MaxAuthTries 6" /etc/ssh/sshd_config || echo "MaxAuthTries 6" >> /etc/ssh/sshd_config
+
+# Desabilitar autenticação apenas por chave pública (permitir senha)
+sed -i 's/^#\?PubkeyAuthentication.*/PubkeyAuthentication yes/' /etc/ssh/sshd_config
+sed -i 's/^#\?ChallengeResponseAuthentication.*/ChallengeResponseAuthentication no/' /etc/ssh/sshd_config
+sed -i 's/^#\?UsePAM.*/UsePAM yes/' /etc/ssh/sshd_config
 
 # Configurar firewall permissivo (INSEGURO)
 # VULNERABILIDADE 5: Firewall com política default allow
