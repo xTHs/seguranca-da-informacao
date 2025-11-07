@@ -43,10 +43,12 @@ sed -i 's/^#\?MaxAuthTries.*/MaxAuthTries 6/' /etc/ssh/sshd_config
 grep -q "^PasswordAuthentication yes" /etc/ssh/sshd_config || echo "PasswordAuthentication yes" >> /etc/ssh/sshd_config
 grep -q "^PermitRootLogin yes" /etc/ssh/sshd_config || echo "PermitRootLogin yes" >> /etc/ssh/sshd_config
 grep -q "^MaxAuthTries 6" /etc/ssh/sshd_config || echo "MaxAuthTries 6" >> /etc/ssh/sshd_config
+grep -q "^KbdInteractiveAuthentication yes" /etc/ssh/sshd_config || echo "KbdInteractiveAuthentication yes" >> /etc/ssh/sshd_config
 
-# Desabilitar autenticação apenas por chave pública (permitir senha)
+# Habilitar autenticação por senha via PAM
 sed -i 's/^#\?PubkeyAuthentication.*/PubkeyAuthentication yes/' /etc/ssh/sshd_config
-sed -i 's/^#\?ChallengeResponseAuthentication.*/ChallengeResponseAuthentication no/' /etc/ssh/sshd_config
+sed -i 's/^#\?KbdInteractiveAuthentication.*/KbdInteractiveAuthentication yes/' /etc/ssh/sshd_config
+sed -i 's/^#\?ChallengeResponseAuthentication.*/ChallengeResponseAuthentication yes/' /etc/ssh/sshd_config
 sed -i 's/^#\?UsePAM.*/UsePAM yes/' /etc/ssh/sshd_config
 
 # Configurar firewall permissivo (INSEGURO)
