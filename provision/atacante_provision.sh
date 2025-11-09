@@ -29,6 +29,9 @@ apt-get install -y nmap hydra tcpdump python3-pip
 # ssh-audit: Ferramenta de auditoria de configurações SSH
 pip3 install --quiet ssh-audit
 
+# Instalar Ansible para hardening
+apt-get install -y ansible sshpass
+
 # Configurar resolução de nomes local
 grep -q "192.168.56.10 def-weak" /etc/hosts || echo "192.168.56.10 def-weak" >> /etc/hosts
 grep -q "192.168.56.20 atacante" /etc/hosts || echo "192.168.56.20 atacante" >> /etc/hosts

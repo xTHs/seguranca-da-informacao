@@ -162,6 +162,11 @@ seguranca-da-informacao/
 
 ## 🆘 Problemas Comuns
 
+### Validar Ambiente
+```bash
+vagrant ssh atacante -c "bash /vagrant/scripts/validar-ambiente.sh"
+```
+
 ### VMs não sobem
 ```bash
 vboxmanage --version
@@ -181,6 +186,9 @@ sudo systemctl status ssh
 ```bash
 vagrant destroy -f && vagrant up
 ```
+
+### Problemas no Windows
+Veja **[TROUBLESHOOTING-WINDOWS.md](TROUBLESHOOTING-WINDOWS.md)** para soluções específicas
 
 ## 📊 Checklist
 

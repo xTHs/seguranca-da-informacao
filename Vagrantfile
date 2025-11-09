@@ -1,5 +1,6 @@
 Vagrant.configure("2") do |config|
-  config.vm.synced_folder ".", "/vagrant", disabled: true
+  config.vm.synced_folder ".", "/vagrant"
+  config.vm.synced_folder "./evidence", "/vagrant/evidence", create: true
   config.vm.box = "ubuntu/jammy64"
   
   # VM DEFENSOR FRACO (Alvo)
