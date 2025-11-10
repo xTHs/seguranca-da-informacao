@@ -104,9 +104,11 @@ Aplica-se a todos os usuários: alunos, professores, técnicos e visitantes.
 - **Emergências**: (62) 9 9415-4589
 
 ## 9. Vigência
-Esta política entra em vigor em [DATA] e será revisada anualmente.
+Esta política entra em vigor em 2025 e será revisada anualmente.
 
 ---
 **Versão**: 1.0  
-**Data**: 2025-01-24  
-**Aprovado por**: [Autoridade Competente]
+**Data**: 2025-11-01 
+
+
+
