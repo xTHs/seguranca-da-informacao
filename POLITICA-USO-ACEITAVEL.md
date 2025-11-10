@@ -99,9 +99,9 @@ Aplica-se a todos os usuários: alunos, professores, técnicos e visitantes.
 
 ## 8. Contatos
 
-- **Incidentes de Segurança**: security@instituicao.edu.br
-- **Suporte Técnico**: suporte@instituicao.edu.br
-- **Emergências**: (XX) XXXX-XXXX
+- **Incidentes de Segurança**: smt.thiago99@gmail.com
+- **Suporte Técnico**: smt.thiago99@gmail.com
+- **Emergências**: (62) 9 9415-4589
 
 ## 9. Vigência
 Esta política entra em vigor em [DATA] e será revisada anualmente.
