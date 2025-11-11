@@ -231,4 +231,5 @@ Veja **[TROUBLESHOOTING-WINDOWS.md](TROUBLESHOOTING-WINDOWS.md)** para soluçõe
 
 **📝 Atualizado**: 2025-01-24  
 **📜 Licença**: MIT
+
 **Link documentação**: https://docs.google.com/document/d/1GOJ9r4SNWSERWHX2_SKMJfhBJpQuzHD33Wq4xwfmC34/edit?usp=sharing
