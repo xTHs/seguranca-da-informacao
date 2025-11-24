@@ -54,15 +54,18 @@ vagrant ssh def-weak    # Máquina vulnerável
 
 ## 🧪 Experimentos
 
-### 1. Descoberta
+### 1. Descoberta de Rede
 ```bash
-# Na VM atacante
-nmap -sS -sV -p 22 192.168.56.10
+# Descobrir hosts ativos
+sudo nmap -sn 192.168.56.0/24
+
+# Scan de portas SSH
+sudo nmap -sS -sV -p 22 <ip-alvo>
 ```
 
-### 2. Auditoria
+### 2. Auditoria SSH
 ```bash
-ssh-audit 192.168.56.10
+ssh-audit <ip-alvo>
 ```
 
 ### 3. Teste de Acesso
@@ -73,7 +76,8 @@ ssh prof@192.168.56.10
 
 ### 4. Força Bruta
 ```bash
-hydra -l prof -p Prof123 -t 2 192.168.56.10 ssh
+# Ataque com wordlist de senhas comuns
+hydra -l prof -P /vagrant/wordlists/senhas-comuns.txt -t 4 192.168.56.10 ssh
 ```
 
 ### 5. Análise de Logs
@@ -153,6 +157,31 @@ seguranca-da-informacao/
 - Atacar sistemas de terceiros
 - Redes produtivas
 - Sem autorização expressa
+
+## 📖 Glossário de Comandos
+
+### Nmap
+- `-sn` = Ping scan (descobre hosts sem scan de portas)
+- `-sS` = SYN scan (stealth, não completa conexão TCP)
+- `-sV` = Detecção de versão de serviços
+- `-p` = Especifica portas (ex: `-p 22` ou `-p-` para todas)
+
+### Hydra
+- `-l` = Login/usuário único
+- `-L` = Lista de usuários
+- `-p` = Senha única
+- `-P` = Wordlist de senhas
+- `-t` = Threads paralelas
+
+### SSH
+- `PermitRootLogin` = Permite login direto como root
+- `MaxAuthTries` = Tentativas de autenticação permitidas
+- `PubkeyAuthentication` = Autenticação por chave pública
+
+### Outros
+- `journalctl` = Visualiza logs do systemd
+- `fail2ban` = Bloqueia IPs após tentativas falhas
+- `UFW` = Uncomplicated Firewall (firewall simplificado)
 
 ## 🔑 Credenciais (DEMO)
 - **User**: prof
