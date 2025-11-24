@@ -97,13 +97,13 @@ sudo tail -f /var/log/auth.log
 
 ### 7. Auditoria - Identificar Vulnerabilidades
 ```bash
-# Auditar configurações SSH
+# Na VM atacante, auditar configurações SSH do alvo
 ssh-audit 192.168.56.10
 ```
 
 ### 8. Defesa - Hardening (Opcional)
 ```bash
-# Aplicar correções de segurança
+# Na VM atacante, aplicar correções de segurança
 cd /vagrant/scripts
 ./hardening.sh
 ```
@@ -194,6 +194,7 @@ seguranca-da-informacao/
 
 ### Outros
 - `journalctl` = Visualiza logs do systemd
+- `tail -f` = Monitora arquivo em tempo real (follow)
 - `fail2ban` = Bloqueia IPs após tentativas falhas
 - `UFW` = Uncomplicated Firewall (firewall simplificado)
 

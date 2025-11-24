@@ -10,7 +10,7 @@ if ! command -v ansible-playbook &> /dev/null; then
 fi
 
 echo "Executando hardening..."
-ansible-playbook -i inventory.ini hardening.yml
+ansible-playbook -i inventory.ini hardening.yml -e "ansible_become_pass=Prof123"
 
 echo ""
 echo "Validando..."
