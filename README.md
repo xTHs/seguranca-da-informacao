@@ -2,7 +2,7 @@
 
 Laboratório prático de segurança SSH com 2 VMs isoladas para testes éticos.
 
-## 🏗️ Arquitetura
+## Arquitetura
 
 ```
 ┌─────────────────────────────────────┐
@@ -16,7 +16,7 @@ Laboratório prático de segurança SSH com 2 VMs isoladas para testes éticos.
 │def-weak  │    │atacante  │
 │.10       │    │.20       │
 ├──────────┤    ├──────────┤
-│❌ ALVO   │    │🔧 TESTES │
+│ ALVO     │    │ TESTES   │
 │Senha     │    │nmap      │
 │fraca     │    │hydra     │
 │Root      │    │ssh-audit │
@@ -24,7 +24,7 @@ Laboratório prático de segurança SSH com 2 VMs isoladas para testes éticos.
 └──────────┘    └──────────┘
 ```
 
-## 🚀 Setup Rápido
+## Setup Rápido
 
 ### Ubuntu
 ```bash
@@ -43,7 +43,7 @@ vagrant up
 - Vagrant: https://www.vagrantup.com/downloads
 - Executar: `vagrant up`
 
-**Requisitos:** 2GB RAM, virtualização habilitada na BIOS
+**Requisitos:** 1GB RAM (mínimo), virtualização habilitada na BIOS
 
 ### Acesso
 
@@ -52,7 +52,7 @@ vagrant ssh atacante    # Máquina de testes
 vagrant ssh def-weak    # Máquina vulnerável
 ```
 
-## 🧪 Experimentos
+## Experimentos
 
 ### 1. Reconhecimento - Descoberta de Rede
 ```bash
@@ -108,7 +108,7 @@ cd /vagrant/scripts
 ./hardening.sh
 ```
 
-## 🎓 Vulnerabilidades Demonstradas
+## Vulnerabilidades Demonstradas
 
 | Vulnerabilidade | Impacto | Mitigação |
 |----------------|---------|-----------|
@@ -118,7 +118,7 @@ cd /vagrant/scripts
 | Firewall aberto | Alto | UFW default deny |
 | Algoritmos fracos | Médio | Desabilitar ciphers antigos |
 
-## 🛠️ Comandos Úteis
+## Comandos Úteis
 
 ```bash
 vagrant status          # Ver status
@@ -128,7 +128,7 @@ vagrant destroy -f      # Destruir VMs
 vagrant reload          # Reiniciar VMs
 ```
 
-## 📁 Estrutura
+## Estrutura
 
 ```
 seguranca-da-informacao/
@@ -142,37 +142,43 @@ seguranca-da-informacao/
 ├── scripts/
 │   ├── hash-evidence.sh           # Calcular hashes
 │   ├── teste-lab.sh               # Teste automatizado
+│   ├── validar-ambiente.sh        # Validação completa
 │   └── hardening.sh               # Aplicar hardening
+├── wordlists/
+│   ├── senhas-comuns.txt          # Wordlist para força bruta
+│   └── usuarios-comuns.txt        # Lista de usuários comuns
+├── evidence/                      # Pasta para evidências forenses
 ├── RELATORIO-AUDITORIA.md         # Análise forense completa
 ├── POLITICA-USO-ACEITAVEL.md      # Política institucional
 ├── PLANO-TREINAMENTO.md           # Capacitação de usuários
 ├── DIAGRAMA-ARQUITETURA.md        # Diagramas técnicos
+├── TROUBLESHOOTING-WINDOWS.md     # Soluções para Windows
 └── README.md                      # Este arquivo
 ```
 
-## 💻 Requisitos
+## Requisitos
 
 | Recurso | Mínimo | Recomendado |
 |---------|--------|-------------|
-| RAM | 2GB | 4GB |
+| RAM | 1GB (512MB/VM) | 2GB (1GB/VM) |
 | CPU | 2 cores | 4 cores |
 | Disco | 3GB | 5GB |
 
-## ⚠️ Avisos Legais
+## Avisos Legais
 
 > **ATENÇÃO:** Uso exclusivo para fins educacionais em ambiente isolado. Ataques não autorizados são crime (Lei 12.737/2012).
 
-### ✅ Permitido
+### Permitido
 - Ambiente isolado (host-only)
 - VMs próprias
 - Fins acadêmicos
 
-### ❌ Proibido
+### Proibido
 - Atacar sistemas de terceiros
 - Redes produtivas
 - Sem autorização expressa
 
-## 📖 Glossário de Comandos
+## Glossário de Comandos
 
 ### Nmap
 - `-sn` = Ping scan (descobre hosts sem scan de portas)
@@ -187,24 +193,55 @@ seguranca-da-informacao/
 - `-P` = Wordlist de senhas
 - `-t` = Threads paralelas
 
-### SSH
+### SSH (Configurações sshd_config)
 - `PermitRootLogin` = Permite login direto como root
 - `MaxAuthTries` = Tentativas de autenticação permitidas
 - `PubkeyAuthentication` = Autenticação por chave pública
+- `PasswordAuthentication` = Permite autenticação por senha
+- `KbdInteractiveAuthentication` = Autenticação interativa por teclado
+- `UsePAM` = Usa módulos PAM para autenticação
+- `AllowUsers` = Lista de usuários permitidos para SSH
+- `LoginGraceTime` = Tempo limite para completar login (segundos)
 
-### Outros
+### Ferramentas de Análise
 - `journalctl` = Visualiza logs do systemd
+  - `-u` = Filtra por unidade/serviço
+  - `--since` = Filtra logs desde data/hora específica
 - `tail -f` = Monitora arquivo em tempo real (follow)
-- `fail2ban` = Bloqueia IPs após tentativas falhas
-- `UFW` = Uncomplicated Firewall (firewall simplificado)
+- `tcpdump` = Captura e analisa pacotes de rede
+- `nc` (netcat) = Ferramenta de rede para testar conexões TCP/UDP
+- `ausearch` = Busca em logs do auditd (sistema de auditoria Linux)
 
-## 🔑 Credenciais (DEMO)
+### Segurança e Hardening
+- `fail2ban` = Bloqueia IPs após tentativas falhas de autenticação
+- `UFW` = Uncomplicated Firewall (firewall simplificado)
+- `ssh-audit` = Auditoria de configurações e algoritmos SSH
+- `ansible-playbook` = Executa playbooks de automação Ansible
+- `sshpass` = Passa senha para SSH de forma não-interativa
+
+### Pacotes de Segurança
+- `unattended-upgrades` = Atualizações automáticas de segurança
+- `libpam-pwquality` = Biblioteca para validação de qualidade de senhas
+
+## Siglas e Termos Técnicos
+
+- **MFA/2FA** = Multi-Factor Authentication / Two-Factor Authentication (autenticação em dois fatores)
+- **IDS/IPS** = Intrusion Detection System / Intrusion Prevention System (detecção/prevenção de intrusão)
+- **SIEM** = Security Information and Event Management (gerenciamento de eventos de segurança)
+- **PAM** = Pluggable Authentication Modules (módulos de autenticação plugáveis do Linux)
+- **LGPD** = Lei Geral de Proteção de Dados (Lei 13.709/2018)
+- **SAST** = Static Application Security Testing (análise estática de segurança)
+- **SCA** = Software Composition Analysis (análise de componentes de software)
+- **SSH** = Secure Shell (protocolo de acesso remoto seguro)
+- **TCP/UDP** = Transmission Control Protocol / User Datagram Protocol (protocolos de rede)
+
+## Credenciais (DEMO)
 - **User**: prof
 - **Pass**: Prof123
 - **IP Defensor**: 192.168.56.10
 - **IP Atacante**: 192.168.56.20
 
-## 🆘 Problemas Comuns
+## Problemas Comuns
 
 ### Validar Ambiente
 ```bash
@@ -234,7 +271,7 @@ vagrant destroy -f && vagrant up
 ### Problemas no Windows
 Veja **[TROUBLESHOOTING-WINDOWS.md](TROUBLESHOOTING-WINDOWS.md)** para soluções específicas
 
-## 📊 Checklist
+## Checklist
 
 - [ ] VirtualBox instalado
 - [ ] Vagrant instalado
@@ -245,15 +282,15 @@ Veja **[TROUBLESHOOTING-WINDOWS.md](TROUBLESHOOTING-WINDOWS.md)** para soluçõe
 - [ ] Hydra tem sucesso
 - [ ] Logs visíveis
 
-## 🏆 Objetivos de Aprendizado
+## Objetivos de Aprendizado
 
-- ✅ Identificar vulnerabilidades SSH
-- ✅ Explorar sistemas inseguros eticamente
-- ✅ Analisar logs e evidências
-- ✅ Aplicar hardening
-- ✅ Validar melhorias de segurança
+- Identificar vulnerabilidades SSH
+- Explorar sistemas inseguros eticamente
+- Analisar logs e evidências
+- Aplicar hardening
+- Validar melhorias de segurança
 
-## 📚 Documentação Completa
+## Documentação Completa
 
 ### Documentos Principais
 - **[RELATORIO-AUDITORIA.md](RELATORIO-AUDITORIA.md)** - Análise de 6 vulnerabilidades, forense digital, cadeia de custódia
@@ -265,7 +302,7 @@ Veja **[TROUBLESHOOTING-WINDOWS.md](TROUBLESHOOTING-WINDOWS.md)** para soluçõe
 - **[SETUP-UBUNTU.md](SETUP-UBUNTU.md)** - Instalação detalhada no Ubuntu
 - **[ROTEIRO-APRESENTACAO.md](ROTEIRO-APRESENTACAO.md)** - Roteiro completo para apresentação em sala
 
-## 📞 Suporte
+## Suporte
 
 - **Issues**: https://github.com/xTHs/seguranca-da-informacao/issues
 - **Docs Vagrant**: https://www.vagrantup.com/docs
@@ -273,7 +310,7 @@ Veja **[TROUBLESHOOTING-WINDOWS.md](TROUBLESHOOTING-WINDOWS.md)** para soluçõe
 
 ---
 
-**📝 Atualizado**: 2025-01-24  
-**📜 Licença**: MIT
+**Atualizado**: 2025-01-24  
+**Licença**: MIT
 
 **Link documentação**: https://docs.google.com/document/d/1GOJ9r4SNWSERWHX2_SKMJfhBJpQuzHD33Wq4xwfmC34/edit?usp=sharing
