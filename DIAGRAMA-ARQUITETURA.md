@@ -6,38 +6,38 @@
 ┌─────────────────────────────────────────────────────────────┐
 │                    HOST FÍSICO (LINUX)                       │
 │                                                              │
-│  ┌────────────────────────────────────────────────────────┐ │
-│  │         VirtualBox Host-Only Network                   │ │
-│  │              192.168.56.0/24                           │ │
-│  │                                                        │ │
-│  │   ┌──────────────────────┐   ┌──────────────────────┐ │ │
-│  │   │   def-weak (Alvo)    │   │  atacante (Testes)   │ │ │
-│  │   │  192.168.56.10       │   │  192.168.56.20       │ │ │
-│  │   │                      │   │                      │ │ │
-│  │   │  Ubuntu 22.04        │   │  Ubuntu 22.04        │ │ │
-│  │   │  512MB RAM           │   │  512MB RAM           │ │ │
-│  │   │  1 CPU               │   │  1 CPU               │ │ │
-│  │   │                      │   │                      │ │ │
-│  │   │  Serviços:           │   │  Ferramentas:        │ │ │
-│  │   │  - SSH (22/tcp)      │   │  - nmap              │ │ │
-│  │   │  - rsyslog           │   │  - hydra             │ │ │
-│  │   │  - UFW (permissivo)  │   │  - ssh-audit         │ │ │
-│  │   │                      │   │  - tcpdump           │ │ │
-│  │   │  Vulnerável:         │   │  - python3           │ │ │
-│  │   │  ✗ Senha fraca       │   │                      │ │ │
-│  │   │  ✗ Root login        │   │                      │ │ │
-│  │   │  ✗ Sem MFA           │   │                      │ │ │
-│  │   │  ✗ Sem fail2ban      │   │                      │ │ │
-│  │   └──────────────────────┘   └──────────────────────┘ │ │
-│  │              │                         │               │ │
-│  │              └─────────────────────────┘               │ │
-│  │                    Rede Isolada                        │ │
-│  └────────────────────────────────────────────────────────┘ │
+│  ┌────────────────────────────────────────────────────────┐  │
+│  │         VirtualBox Host-Only Network                   │  │
+│  │              192.168.56.0/24                           │  │
+│  │                                                        │  │
+│  │   ┌──────────────────────┐   ┌──────────────────────┐  │  │
+│  │   │   def-weak (Alvo)    │   │  atacante (Testes)   │  │  │
+│  │   │  192.168.56.10       │   │  192.168.56.20       │  │  │
+│  │   │                      │   │                      │  │  │
+│  │   │  Ubuntu 22.04        │   │  Ubuntu 22.04        │  │  │
+│  │   │  512MB RAM           │   │  512MB RAM           │  │  │
+│  │   │  1 CPU               │   │  1 CPU               │  │  │
+│  │   │                      │   │                      │  │  │
+│  │   │  Serviços:           │   │  Ferramentas:        │  │  │
+│  │   │  - SSH (22/tcp)      │   │  - nmap              │  │  │
+│  │   │  - rsyslog           │   │  - hydra             │  │  │
+│  │   │  - UFW (permissivo)  │   │  - ssh-audit         │  │  │
+│  │   │                      │   │  - tcpdump           │  │  │
+│  │   │  Vulnerável:         │   │  - ansible           │  │  │
+│  │   │  ✗ Senha fraca       │   │  - sshpass           │  │  │
+│  │   │  ✗ Root login        │   │  - python3           │  │  │
+│  │   │  ✗ Sem MFA           │   │                      │  │  │
+│  │   │  ✗ Sem fail2ban      │   │                      │  │  │
+│  │   └──────────────────────┘   └──────────────────────┘  │  │
+│  │              │                         │               │  │
+│  │              └─────────────────────────┘               │  │
+│  │                    Rede Isolada                        │  │
+│  └────────────────────────────────────────────────────────┘  │
 │                                                              │
-└─────────────────────────────────────────────────────────────┘
+└──────────────────────────────────────────────────────────────┘
 ```
 
-## 2. Fluxo de Ataque
+## 2. Fluxo de Ataque (Sequência dos Experimentos)
 
 ```
 ┌─────────────┐
@@ -46,49 +46,86 @@
 │     .20     │
 └──────┬──────┘
        │
-       │ 1. Reconhecimento
+       │ 1. Reconhecimento - Descoberta de Rede
+       │ nmap -sn 192.168.56.0/24
        │ nmap -sS -sV -p 22 192.168.56.10
        │
        ▼
-┌─────────────────────────────────────┐
-│  Descoberta de Serviços             │
-│  - SSH aberto na porta 22           │
-│  - OpenSSH 8.9p1                    │
-│  - PasswordAuthentication: yes      │
-└──────┬──────────────────────────────┘
+┌─────────────────────────────────────────────────┐
+│  Descoberta de Serviços                         │
+│  - Host ativo: 192.168.56.10                    │
+│  - SSH aberto na porta 22                       │
+│  - OpenSSH 8.9p1 Ubuntu                         │
+│  - PasswordAuthentication: yes                  │
+└──────┬──────────────────────────────────────────┘
        │
-       │ 2. Auditoria
+       │ 2. Invasão - Força Bruta SSH
+       │ hydra -l prof -P senhas-comuns.txt
+       │       -t 4 192.168.56.10 ssh
+       │
+       ▼
+┌─────────────────────────────────────────────────┐
+│  Credenciais Descobertas                        │
+│  - Usuário: prof                                │
+│  - Senha: Prof123                               │
+│  - Tentativas: ~12 (de 27 senhas)               │
+└──────┬──────────────────────────────────────────┘
+       │
+       │ 3. Invasão - Password Spraying (Alternativa)
+       │ hydra -L usuarios-comuns.txt -p Prof123
+       │       -t 4 192.168.56.10 ssh
+       │
+       ▼
+┌─────────────────────────────────────────────────┐
+│  4. Invasão - Acesso Direto                     │
+│  ssh prof@192.168.56.10                         │
+│  Senha: Prof123                                 │
+└──────┬──────────────────────────────────────────┘
+       │
+       ▼
+┌─────────────────────────────────────────────────┐
+│  Acesso Bem-Sucedido                            │
+│  - Login como usuário 'prof'                    │
+│  - Privilégios sudo                             │
+│  - Acesso total ao sistema                      │
+└──────┬──────────────────────────────────────────┘
+       │
+       │ 5. Invasão - Exploração de Root Login
+       │ ssh root@192.168.56.10
+       │ (se root login habilitado)
+       │
+       ▼
+┌─────────────────────────────────────────────────┐
+│  6. Pós-Exploração - Análise de Logs            │
+│  journalctl -u ssh --since "-15 min"            │
+│  tail -f /var/log/auth.log                      │
+└──────┬──────────────────────────────────────────┘
+       │
+       │ 7. Auditoria - Identificar Vulnerabilidades
        │ ssh-audit 192.168.56.10
        │
        ▼
-┌─────────────────────────────────────┐
-│  Identificação de Vulnerabilidades  │
-│  - Root login habilitado            │
-│  - MaxAuthTries: 6                  │
-│  - Algoritmos fracos                │
-└──────┬──────────────────────────────┘
+┌─────────────────────────────────────────────────┐
+│  Vulnerabilidades Confirmadas                   │
+│  - Root login habilitado                        │
+│  - MaxAuthTries: 6                              │
+│  - Algoritmos fracos                            │
+│  - Sem fail2ban                                 │
+└──────┬──────────────────────────────────────────┘
        │
-       │ 3. Exploração
-       │ ssh prof@192.168.56.10
-       │ Senha: Prof123
-       │
-       ▼
-┌─────────────────────────────────────┐
-│  Acesso Bem-Sucedido                │
-│  - Login como usuário 'prof'        │
-│  - Privilégios sudo                 │
-└──────┬──────────────────────────────┘
-       │
-       │ 4. Pós-Exploração
-       │ Manipulação de arquivos
+       │ 8. Defesa - Hardening (Opcional)
+       │ cd /vagrant/scripts
+       │ ./hardening.sh
        │
        ▼
-┌─────────────────────────────────────┐
-│  Impacto                            │
-│  - Acesso não autorizado            │
-│  - Modificação de dados             │
-│  - Logs de atividade                │
-└─────────────────────────────────────┘
+┌─────────────────────────────────────────────────┐
+│  Sistema Protegido                              │
+│  - PasswordAuthentication no                    │
+│  - PermitRootLogin no                           │
+│  - MaxAuthTries 3                               │
+│  - fail2ban ativo                               │
+│  - UFW default deny                             │
+└─────────────────────────────────────────────────┘
 ```
 
 ## 3. Arquitetura de Hardening

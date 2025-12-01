@@ -3,7 +3,7 @@
 # Script: atacante_provision.sh
 # Descrição: Provisionamento da VM atacante com ferramentas de teste de segurança
 # Autor: Projeto Segurança da Informação
-# Data: 2025-01-24
+# Data: 2025-09-24
 # Uso: Executado automaticamente pelo Vagrant durante 'vagrant up'
 # ATENÇÃO: Uso exclusivo para fins educacionais em ambiente isolado!
 # ==============================================================================
