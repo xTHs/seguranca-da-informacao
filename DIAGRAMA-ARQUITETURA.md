@@ -235,13 +235,13 @@
 │  IMPACTO                                                     │
 │    ▲                                                         │
 │    │                                                         │
-│  C │  [Root Login]      [Senha Fraca]                       │
+│  C │  [Root Login]      [Senha Fraca]                        │
 │  R │                                                         │
 │  Í │                                                         │
 │  T │                    [Sem MFA]                            │
 │  I │                                                         │
 │  C │                                                         │
-│  O │  [Logs Locais]     [Sem IDS]    [Firewall Permissivo]  │
+│  O │  [Logs Locais]     [Sem IDS]    [Firewall Permissivo]   │
 │    │                                                         │
 │  B │                                                         │
 │  A │                                                         │
